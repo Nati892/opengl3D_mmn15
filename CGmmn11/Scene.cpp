@@ -13,6 +13,10 @@
 #define PRESENT_COLOR_G 1
 #define PRESENT_COLOR_B 1
 
+#define ORTHO_X 10
+#define ORTHO_Y 10
+#define FRUSTUM_X 2
+#define FRUSTUM_Y 2
 
 int scale_x_start = -960;
 int scale_x_end = 960;
@@ -33,7 +37,9 @@ int WindowRectBounds_y = 0;
 int WindowRectBounds_width = 0;
 int WindowRectBounds_height = 0;
 
-AnimationTimer* MyAnimationTimer;
+//scene control and animation structs
+AnimationTimer* FasterAnimationTimer;
+AnimationTimer* SlowerAnimationTimer;
 UserPref CurrentUserControl;
 
 void CleanupAndExit()
@@ -130,7 +136,8 @@ void DrawMenu()
 		0, 0, 0,
 		0, 1, 0);
 
-	float val = MyAnimationTimer->GetCurrentAnimationValue();
+	float fastSpeedPoint = FasterAnimationTimer->GetCurrentAnimationValue();
+	float slowSpeedPoint = SlowerAnimationTimer->GetCurrentAnimationValue();
 
 	//show options
 	//glScalef(0.03,0.03,0.03);
@@ -139,13 +146,14 @@ void DrawMenu()
 		glPushMatrix();
 		glScalef(0.3, 0.3, 0.3);
 		glTranslatef(30 - (4 * i), 30, 0);
-		glRotatef(val, 0, 1, 0);
 		if ((SceneObj)i == CurrentUserControl.currentObj)
 		{
+			glRotatef(fastSpeedPoint, 0, 1, 0);
 			drawRotatingObject((SceneObj)i, SELECTED_COLOR_R, SELECTED_COLOR_G, SELECTED_COLOR_B);
 		}
 		else
 		{
+			glRotatef(slowSpeedPoint, 0, 1, 0);
 			drawRotatingObject((SceneObj)i, PRESENT_COLOR_R, PRESENT_COLOR_G, PRESENT_COLOR_B);
 		}
 		glPopMatrix();
@@ -155,11 +163,6 @@ void DrawMenu()
 }
 
 
-#define ORTHO_X 10
-#define ORTHO_Y 10
-
-#define FRUSTUM_X 2
-#define FRUSTUM_Y 2
 
 void DrawScene(bool IsOrtho)
 {
@@ -181,7 +184,7 @@ void DrawScene(bool IsOrtho)
 		0, 1, 0);
 
 	Draw3DAxis(true, true, false);
-	float val = MyAnimationTimer->GetCurrentAnimationValue();
+	float val = FasterAnimationTimer->GetCurrentAnimationValue();
 	glRotatef(val, 0, 1, 0);
 	drawRotatingObject(CurrentUserControl.currentObj, 0, 1, 1);
 }
@@ -250,7 +253,8 @@ void KeyboardEventCallback(unsigned char c, int x, int y)
 		break;
 	}
 
-
+	//I know this is a ajnky solution because who can guerantee that these values are the min and max? 
+	//I still prefer this for now, its not production grade code and if it will ever be I'll use a better data struct
 	if (CurrentUserControl.currentObj < 0)
 	{
 		CurrentUserControl.currentObj = enum_Teapot;
@@ -261,7 +265,7 @@ void KeyboardEventCallback(unsigned char c, int x, int y)
 		CurrentUserControl.currentObj = enum_Sphere;
 	}
 
-	MyAnimationTimer->SetSpeed(CurrentUserControl.AnimationSpeed);
+	FasterAnimationTimer->SetSpeed(CurrentUserControl.AnimationSpeed);
 }
 
 void timerCallback(int value) {
@@ -295,9 +299,10 @@ void MyInit(int argc, char** argv)
 	CurrentUserControl.AnimationSpeed = 3;
 	CurrentUserControl.IsOrtho = true;
 
-	MyAnimationTimer = new AnimationTimer(CurrentUserControl.AnimationSpeed, 0, 360);
-	MyAnimationTimer->StartTimer();
-
+	FasterAnimationTimer = new AnimationTimer(CurrentUserControl.AnimationSpeed, 0, 360);
+	SlowerAnimationTimer = new AnimationTimer(CurrentUserControl.AnimationSpeed*4, 0, 360);
+	FasterAnimationTimer->StartTimer();
+	SlowerAnimationTimer->StartTimer();
 
 	glEnable(GL_DEPTH_TEST);  // Enable depth testing for 3D rendering
 }

@@ -15,9 +15,12 @@ public:
 	AnimationTimer(float Speed, float StartValue, float EndValue);
 	void StartTimer();
 	float GetCurrentAnimationValue();
+	float GetCurrentAnimationPositonPrecentage();
+	void SetSpeed(float new_Speed);
+
+	//For time measurement which I didn't use eventually
 	void SampleNow();
 	float TimeLapseFromLastSampleMillis();
 	float TimeLapseFromLastSampleMicros();
 	float TimeLapseFromLastSampleNanos();
-	void SetSpeed(float new_Speed);
 };
