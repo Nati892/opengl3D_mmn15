@@ -18,10 +18,11 @@ void DrawBackgroundWithColor(float r, float g, float b)
 void DrawText(std::string str, float x, float y)
 {
 	glColor3f(0, 0, 0);
-	glRasterPos2f(x, y);
+	glRasterPos3f(x, y,4);
 	for (int i = 0; i < str.size(); i++)
 	{
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, str.at(i));
+		
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, str.at(i));
 	}
 }
 

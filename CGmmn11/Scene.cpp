@@ -2,22 +2,20 @@
 
 //macros
 #define MY_NAME "Netanel Cohen Gindi"
-#define MY_HEADER "drawPaperPlane"
-#define MaxFPS 60
-
+#define MY_HEADER "Draw platonic solid"
+#define MAX_FPS 60
 #define SELECTED_COLOR_R 1
 #define SELECTED_COLOR_G 0
 #define SELECTED_COLOR_B 0
-
 #define PRESENT_COLOR_R 0
 #define PRESENT_COLOR_G 1
 #define PRESENT_COLOR_B 1
-
 #define ORTHO_X 10
 #define ORTHO_Y 10
 #define FRUSTUM_X 2
 #define FRUSTUM_Y 2
 
+//window sizing and aspect ration
 int scale_x_start = -960;
 int scale_x_end = 960;
 int scale_y_start = -540;
@@ -159,11 +157,24 @@ void DrawMenu()
 		glPopMatrix();
 	}
 
+	
+	std::string proj_text;
+	if (CurrentUserControl.IsOrtho)
+	{
+		proj_text = std::string("Current projection: Isometric");
+	}
+	else
+	{
+		proj_text = std::string("Current projection: Perspective");
+	}
 
+	DrawText("Press A/a and D/d to switch shapes", -10, 9);
+	DrawText("Press + and - to change spin speed", -10, 8);
+	DrawText("Press C/c to change projection type", -10, 7);
+	DrawText(proj_text, -10, 6);
 }
 
-
-
+//Draws the scene
 void DrawScene(bool IsOrtho)
 {
 	glMatrixMode(GL_MODELVIEW | GL_PROJECTION);
@@ -243,10 +254,11 @@ void KeyboardEventCallback(unsigned char c, int x, int y)
 		CurrentUserControl.AnimationSpeed = CurrentUserControl.AnimationSpeed * 1.1;
 		break;
 
-	case 'c':
+	case 'c'://change perspective type
 	case 'C':
 		CurrentUserControl.IsOrtho = !CurrentUserControl.IsOrtho;
 		break;
+
 	case 'q':
 	case 'Q':
 		exit(0);
@@ -300,7 +312,7 @@ void MyInit(int argc, char** argv)
 	CurrentUserControl.IsOrtho = true;
 
 	FasterAnimationTimer = new AnimationTimer(CurrentUserControl.AnimationSpeed, 0, 360);
-	SlowerAnimationTimer = new AnimationTimer(CurrentUserControl.AnimationSpeed*4, 0, 360);
+	SlowerAnimationTimer = new AnimationTimer(CurrentUserControl.AnimationSpeed * 4, 0, 360);
 	FasterAnimationTimer->StartTimer();
 	SlowerAnimationTimer->StartTimer();
 
@@ -320,7 +332,6 @@ void SetEvents()
 //start play my beautiful scene
 void RunScene(int argc, char** argv)
 {
-
 	MyInit(argc, argv);
 	SetEvents();
 	glutMainLoop();
